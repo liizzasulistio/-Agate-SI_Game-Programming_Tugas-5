@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class Bird : MonoBehaviour
 {
@@ -8,6 +9,11 @@ public class Bird : MonoBehaviour
     public GameObject parent;
     public Rigidbody2D rigidBody;
     public CircleCollider2D birdCollider;
+
+    public UnityAction OnBirdDestroyed = delegate {
+	
+
+	};
 
     private BirdState _state;
     private float _minVelocity = 0.05f;
@@ -50,5 +56,10 @@ public class Bird : MonoBehaviour
         birdCollider.enabled = true;
         rigidBody.bodyType = RigidbodyType2D.Dynamic;
         rigidBody.velocity = velocity * speed * distance;
+    }
+
+    private void OnDestroy()
+    {
+        OnBirdDestroyed();
     }
 }
