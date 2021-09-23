@@ -10,10 +10,8 @@ public class Bird : MonoBehaviour
     public Rigidbody2D rigidBody;
     public CircleCollider2D birdCollider;
 
-    public UnityAction OnBirdDestroyed = delegate {
-	};
-    public UnityAction<Bird> OnBirdShot = delegate {
-	};
+    public UnityAction OnBirdDestroyed = delegate {};
+    public UnityAction<Bird> OnBirdShot = delegate {};
     public BirdState State { get { return _state; } }
 
     private BirdState _state;
@@ -67,6 +65,11 @@ public class Bird : MonoBehaviour
     private void OnDestroy()
     {
         if(_state == BirdState.Thrown || _state == BirdState.HitSomething) OnBirdDestroyed();
+    }
+
+    public virtual void OnTap()
+    {
+
     }
 }
 
