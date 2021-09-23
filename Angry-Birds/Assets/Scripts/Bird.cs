@@ -5,15 +5,16 @@ using UnityEngine.Events;
 
 public class Bird : MonoBehaviour
 {
-    public enum BirdState { Idle, Thrown}
+    public enum BirdState { Idle, Thrown, HitSomething}
     public GameObject parent;
     public Rigidbody2D rigidBody;
     public CircleCollider2D birdCollider;
 
     public UnityAction OnBirdDestroyed = delegate {
-	
-
 	};
+    public UnityAction<Bird> OnBirdShot = delegate {
+	};
+    public BirdState State { get { return _state; } }
 
     private BirdState _state;
     private float _minVelocity = 0.05f;
@@ -26,13 +27,17 @@ public class Bird : MonoBehaviour
         _state = BirdState.Idle;
     }
 
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        _state = BirdState.HitSomething;
+    }
     private void FixedUpdate()
     {
         if(_state == BirdState.Idle && rigidBody.velocity.sqrMagnitude >= _minVelocity)
         {
             _state = BirdState.Thrown;
         }
-        if(_state == BirdState.Thrown && rigidBody.velocity.sqrMagnitude < _minVelocity && !_flagDestroy)
+        if((_state == BirdState.Thrown || _state == BirdState.HitSomething) && rigidBody.velocity.sqrMagnitude < _minVelocity && !_flagDestroy)
         {
             _flagDestroy = true;
             StartCoroutine(DestroyAfter(2));
@@ -56,10 +61,12 @@ public class Bird : MonoBehaviour
         birdCollider.enabled = true;
         rigidBody.bodyType = RigidbodyType2D.Dynamic;
         rigidBody.velocity = velocity * speed * distance;
+        OnBirdShot(this);
     }
 
     private void OnDestroy()
     {
-        OnBirdDestroyed();
+        if(_state == BirdState.Thrown || _state == BirdState.HitSomething) OnBirdDestroyed();
     }
 }
+
